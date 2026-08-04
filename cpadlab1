@@ -1,0 +1,296 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const AutoSquadApp());
+}
+
+class AutoSquadApp extends StatelessWidget {
+  const AutoSquadApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: "AutoSquad",
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF080808),
+        fontFamily: 'Poppins',
+      ),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          "AUTOSQUAD",
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            letterSpacing: 3,
+          ),
+        ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 20),
+            child: Icon(Icons.menu_rounded),
+          ),
+        ],
+      ),
+
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xffE53935),
+        onPressed: () {},
+        icon: const Icon(Icons.call),
+        label: const Text("Contact"),
+      ),
+
+      bottomNavigationBar: Container(
+        height: 75,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          border: Border(
+            top: BorderSide(
+              color: Colors.white.withOpacity(.08),
+            ),
+          ),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Icon(Icons.home_rounded),
+            Icon(Icons.directions_car_rounded),
+            Icon(Icons.favorite_outline),
+            Icon(Icons.person_outline),
+          ],
+        ),
+      ),
+
+      body: CustomScrollView(
+        slivers: [
+
+          // HERO SECTION
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 550,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+
+                  Image.network(
+                    "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
+                    fit: BoxFit.cover,
+                  ),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(.2),
+                          Colors.black.withOpacity(.9),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  Positioned(
+                    left: 24,
+                    right: 24,
+                    bottom: 60,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        const Text(
+                          "PREMIUM\nPRE-OWNED\nCARS",
+                          style: TextStyle(
+                            height: 1,
+                            fontSize: 48,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        Text(
+                          "Luxury • Performance • Trust",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(.75),
+                            fontSize: 16,
+                          ),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                          ),
+                          height: 58,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(.08),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(.08),
+                            ),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.search),
+                              SizedBox(width: 12),
+                              Text("Search inventory"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // FEATURED TITLE
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(24, 30, 24, 15),
+              child: Text(
+                "Featured Inventory",
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+
+          // HORIZONTAL CARS
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 310,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: const [
+                  PremiumCarCard(
+                    name: "BMW 530D M Sport",
+                    price: "₹29.99 Lakh",
+                    image:
+                        "https://images.unsplash.com/photo-1555215695-3004980ad54e",
+                  ),
+                  PremiumCarCard(
+                    name: "Porsche 911",
+                    price: "₹1.45 Cr",
+                    image:
+                        "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d",
+                  ),
+                  PremiumCarCard(
+                    name: "Mercedes G63",
+                    price: "₹1.89 Cr",
+                    image:
+                        "https://images.unsplash.com/photo-1494976388531-d1058494cdd8",
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 40),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PremiumCarCard extends StatelessWidget {
+  final String name;
+  final String price;
+  final String image;
+
+  const PremiumCarCard({
+    super.key,
+    required this.name,
+    required this.price,
+    required this.image,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 260,
+      margin: const EdgeInsets.only(right: 18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Stack(
+        children: [
+
+          ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Image.network(
+              image,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
+          ),
+
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withOpacity(.85),
+                ],
+              ),
+            ),
+          ),
+
+          Positioned(
+            left: 18,
+            right: 18,
+            bottom: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  price,
+                  style: const TextStyle(
+                    color: Color(0xffE53935),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
