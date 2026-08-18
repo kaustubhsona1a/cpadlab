@@ -1,0 +1,1165 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const CarDealershipApp());
+}
+
+//app
+
+class CarDealershipApp extends StatelessWidget {
+  const CarDealershipApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Cartronics',
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF090909),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.red,
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      ),
+      home: const HomePage(),
+    );
+  }
+}
+
+// ============================================================
+// CAR MODEL
+// ============================================================
+
+class Car {
+  final String name;
+  final String price;
+  final String category;
+  final String year;
+  final String fuel;
+  final String image;
+
+  Car({
+    required this.name,
+    required this.price,
+    required this.category,
+    required this.year,
+    required this.fuel,
+    required this.image,
+  });
+}
+
+// ============================================================
+// HOME PAGE
+// ============================================================
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String selectedCategory = 'All';
+  String searchText = '';
+
+  final TextEditingController searchController =
+      TextEditingController();
+
+  final List<String> categories = [
+    'All',
+    'Sedan',
+    'Sports',
+    'SUV',
+    'Luxury',
+  ];
+
+  final List<Car> cars = [
+    Car(
+      name: 'BMW 530D M Sport',
+      price: '₹29.99 Lakh',
+      category: 'Sedan',
+      year: '2023',
+      fuel: 'Diesel',
+      image:
+          'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=900&q=80',
+    ),
+    Car(
+      name: 'Porsche 911',
+      price: '₹1.45 Crore',
+      category: 'Sports',
+      year: '2022',
+      fuel: 'Petrol',
+      image:
+          'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=900&q=80',
+    ),
+    Car(
+      name: 'Mercedes G63',
+      price: '₹2.15 Crore',
+      category: 'Luxury',
+      year: '2023',
+      fuel: 'Petrol',
+      image:
+          'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=900&q=80',
+    ),
+    Car(
+      name: 'Range Rover Sport',
+      price: '₹1.25 Crore',
+      category: 'SUV',
+      year: '2022',
+      fuel: 'Diesel',
+      image:
+          'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=900&q=80',
+    ),
+  ];
+
+  final Set<String> favorites = {};
+
+  List<Car> get filteredCars {
+    return cars.where((car) {
+      final matchesCategory =
+          selectedCategory == 'All' ||
+          car.category == selectedCategory;
+
+      final matchesSearch =
+          car.name.toLowerCase().contains(
+                searchText.toLowerCase(),
+              );
+
+      return matchesCategory && matchesSearch;
+    }).toList();
+  }
+
+  // ==========================================================
+  // MESSAGE
+  // ==========================================================
+
+  void showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  // ==========================================================
+  // CONTACT
+  // ==========================================================
+
+  void showContactDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF181818),
+          title: const Text('Contact Cartronics'),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(
+                  Icons.phone,
+                  color: Colors.red,
+                ),
+                title: Text('+91 98765 43210'),
+                subtitle: Text('Call dealership'),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.message,
+                  color: Colors.red,
+                ),
+                title: Text('WhatsApp'),
+                subtitle: Text('Send an enquiry'),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.location_on,
+                  color: Colors.red,
+                ),
+                title: Text('Mumbai'),
+                subtitle: Text('Visit our showroom'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Close',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ==========================================================
+  // MENU
+  // ==========================================================
+
+  void showMenuOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF151515),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  'CARTRONICS',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.home),
+                title: const Text('Home'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.directions_car),
+                title: const Text('Inventory'),
+                onTap: () {
+                  Navigator.pop(context);
+                  showMessage('Showing complete inventory');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.favorite),
+                title: const Text('My Favorites'),
+                onTap: () {
+                  Navigator.pop(context);
+                  showMessage(
+                    '${favorites.length} cars in favorites',
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.info),
+                title: const Text('About Us'),
+                onTap: () {
+                  Navigator.pop(context);
+                  showMessage(
+                    'Cartronics - Premium Pre-Owned Cars',
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ==========================================================
+  // OPEN CAR DETAILS
+  // ==========================================================
+
+  void openCarDetails(Car car) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CarDetailsPage(
+          car: car,
+          isFavorite: favorites.contains(car.name),
+          onFavoriteChanged: () {
+            setState(() {
+              if (favorites.contains(car.name)) {
+                favorites.remove(car.name);
+              } else {
+                favorites.add(car.name);
+              }
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  // ==========================================================
+  // BUILD
+  // ==========================================================
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+
+        // ROW
+        title: const Text(
+          'CARTRONICS',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+          ),
+        ),
+
+        actions: [
+          IconButton(
+            onPressed: showMenuOptions,
+            icon: const Icon(Icons.menu_rounded),
+          ),
+        ],
+      ),
+
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+
+        // COLUMN
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            const Text(
+              'Find Your',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.grey,
+              ),
+            ),
+
+            const Text(
+              'Dream Car.',
+              style: TextStyle(
+                fontSize: 38,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ==================================================
+            // SEARCH BAR
+            // ==================================================
+
+            TextField(
+              controller: searchController,
+              onChanged: (value) {
+                setState(() {
+                  searchText = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search cars...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: searchText.isNotEmpty
+                    ? IconButton(
+                        onPressed: () {
+                          searchController.clear();
+
+                          setState(() {
+                            searchText = '';
+                          });
+                        },
+                        icon: const Icon(Icons.clear),
+                      )
+                    : null,
+                filled: true,
+                fillColor: const Color(0xFF171717),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            // ==================================================
+            // STACK
+            // ==================================================
+
+            GestureDetector(
+              onTap: () {
+                showMessage(
+                  'Premium Collection selected',
+                );
+              },
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Image.network(
+                      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
+                      height: 240,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (context, error, stackTrace) {
+                        return Container(
+                          height: 240,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF202020),
+                            borderRadius:
+                                BorderRadius.circular(25),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.directions_car,
+                              size: 80,
+                              color: Colors.red,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  Container(
+                    height: 240,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.9),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const Positioned(
+                    left: 20,
+                    bottom: 20,
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Premium Collection',
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'Luxury cars. Exceptional condition.',
+                          style: TextStyle(
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ==================================================
+            // CATEGORY ROW
+            // ==================================================
+
+            const Text(
+              'Browse Categories',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            SizedBox(
+              height: 85,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+
+                  final isSelected =
+                      selectedCategory == category;
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCategory = category;
+                      });
+                    },
+                    child: Container(
+                      width: 90,
+                      margin:
+                          const EdgeInsets.only(right: 10),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.red
+                            : const Color(0xFF171717),
+                        borderRadius:
+                            BorderRadius.circular(18),
+                      ),
+                      child: Column(
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            getCategoryIcon(category),
+                            color: Colors.white,
+                            size: 27,
+                          ),
+                          const SizedBox(height: 7),
+                          Text(
+                            category,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ==================================================
+            // FEATURED CARS
+            // ==================================================
+
+            Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  selectedCategory == 'All'
+                      ? 'Featured Cars'
+                      : '$selectedCategory Cars',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '${filteredCars.length} cars',
+                  style: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 15),
+
+            // ==================================================
+            // CAR LIST
+            // ==================================================
+
+            if (filteredCars.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(40),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF171717),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Column(
+                  children: [
+                    Icon(
+                      Icons.search_off,
+                      size: 50,
+                      color: Colors.grey,
+                    ),
+                    SizedBox(height: 15),
+                    Text(
+                      'No cars found',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            ...filteredCars.map(
+              (car) => Padding(
+                padding: const EdgeInsets.only(bottom: 15),
+                child: carCard(car),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ==================================================
+            // WHY CARTRONICS
+            // ==================================================
+
+            Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Why Cartronics?',
+                  style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Icon(
+                  Icons.verified,
+                  color: Colors.red.shade400,
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 15),
+
+            Row(
+              children: [
+                featureCard(
+                  Icons.verified,
+                  'Verified Cars',
+                ),
+                const SizedBox(width: 12),
+                featureCard(
+                  Icons.handshake,
+                  'Trusted Deals',
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+
+      floatingActionButton:
+          FloatingActionButton.extended(
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
+        onPressed: showContactDialog,
+        icon: const Icon(Icons.call),
+        label: const Text('Contact'),
+      ),
+    );
+  }
+
+  // ==========================================================
+  // CATEGORY ICON
+  // ==========================================================
+
+  IconData getCategoryIcon(String category) {
+    switch (category) {
+      case 'Sedan':
+        return Icons.directions_car;
+      case 'Sports':
+        return Icons.speed;
+      case 'SUV':
+        return Icons.airport_shuttle;
+      case 'Luxury':
+        return Icons.star;
+      default:
+        return Icons.apps;
+    }
+  }
+
+  // ==========================================================
+  // CAR CARD
+  // ==========================================================
+
+  Widget carCard(Car car) {
+    final isFavorite =
+        favorites.contains(car.name);
+
+    return GestureDetector(
+      onTap: () {
+        openCarDetails(car);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF171717),
+          borderRadius: BorderRadius.circular(22),
+        ),
+        child: Row(
+          children: [
+
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.horizontal(
+                left: Radius.circular(22),
+              ),
+              child: Image.network(
+                car.image,
+                width: 145,
+                height: 145,
+                fit: BoxFit.cover,
+                errorBuilder:
+                    (context, error, stackTrace) {
+                  return Container(
+                    width: 145,
+                    height: 145,
+                    color: const Color(0xFF222222),
+                    child: const Icon(
+                      Icons.directions_car,
+                      size: 55,
+                      color: Colors.red,
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+
+                // COLUMN
+                child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+                  children: [
+
+                    // ROW
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            car.name,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (isFavorite) {
+                                favorites.remove(
+                                  car.name,
+                                );
+                              } else {
+                                favorites.add(
+                                  car.name,
+                                );
+                              }
+                            });
+                          },
+                          child: Icon(
+                            isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: isFavorite
+                                ? Colors.red
+                                : Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      car.price,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // ROW
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.calendar_today,
+                          size: 13,
+                          color: Colors.grey,
+                        ),
+
+                        const SizedBox(width: 5),
+
+                        Text(
+                          car.year,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        const Icon(
+                          Icons.local_gas_station,
+                          size: 13,
+                          color: Colors.grey,
+                        ),
+
+                        const SizedBox(width: 5),
+
+                        Text(
+                          car.fuel,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==========================================================
+  // FEATURE CARD
+  // ==========================================================
+
+  Widget featureCard(
+    IconData icon,
+    String title,
+  ) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          showMessage('$title selected');
+        },
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: const Color(0xFF171717),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                color: Colors.red,
+                size: 30,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// CAR DETAILS PAGE
+// ============================================================
+
+class CarDetailsPage extends StatefulWidget {
+  final Car car;
+  final bool isFavorite;
+  final VoidCallback onFavoriteChanged;
+
+  const CarDetailsPage({
+    super.key,
+    required this.car,
+    required this.isFavorite,
+    required this.onFavoriteChanged,
+  });
+
+  @override
+  State<CarDetailsPage> createState() =>
+      _CarDetailsPageState();
+}
+
+class _CarDetailsPageState
+    extends State<CarDetailsPage> {
+
+  late bool favorite;
+
+  @override
+  void initState() {
+    super.initState();
+    favorite = widget.isFavorite;
+  }
+
+  void contactDealer() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF181818),
+          title: const Text('Enquire Now'),
+          content: Text(
+            'Interested in ${widget.car.name}?\n\n'
+            'Our dealership team will contact you shortly.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Close',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Enquiry submitted successfully!',
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.car.name),
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                favorite = !favorite;
+              });
+
+              widget.onFavoriteChanged();
+            },
+            icon: Icon(
+              favorite
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color: favorite
+                  ? Colors.red
+                  : Colors.white,
+            ),
+          ),
+        ],
+      ),
+
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+
+            // STACK
+            Stack(
+              children: [
+                Image.network(
+                  widget.car.image,
+                  height: 300,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (context, error, stackTrace) {
+                    return Container(
+                      height: 300,
+                      color: const Color(0xFF222222),
+                      child: const Center(
+                        child: Icon(
+                          Icons.directions_car,
+                          size: 100,
+                          color: Colors.red,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                Positioned(
+                  left: 20,
+                  bottom: 20,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius:
+                          BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      widget.car.category,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(20),
+
+              // COLUMN
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+
+                  Text(
+                    widget.car.name,
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    widget.car.price,
+                    style: const TextStyle(
+                      fontSize: 23,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // ROW
+                  Row(
+                    children: [
+                      detailItem(
+                        Icons.calendar_today,
+                        widget.car.year,
+                      ),
+                      detailItem(
+                        Icons.local_gas_station,
+                        widget.car.fuel,
+                      ),
+                      detailItem(
+                        Icons.verified,
+                        'Verified',
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  const Text(
+                    'Vehicle Overview',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  const Text(
+                    'This premium pre-owned vehicle has been '
+                    'carefully inspected and verified by our '
+                    'dealership team. Contact us to schedule '
+                    'a test drive or receive more information.',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      height: 1.6,
+                      fontSize: 15,
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: contactDealer,
+                      icon: const Icon(Icons.phone),
+                      label: const Text(
+                        'Contact Dealer',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget detailItem(
+    IconData icon,
+    String text,
+  ) {
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            color: Colors.red,
+          ),
+          const SizedBox(height: 7),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
