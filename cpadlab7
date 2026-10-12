@@ -1,0 +1,1080 @@
+import React, { useMemo, useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+// -------------------- TYPES --------------------
+
+type TransactionType = 'Income' | 'Expense';
+
+type Transaction = {
+  id: string;
+  title: string;
+  amount: number;
+  type: TransactionType;
+  category: string;
+  date: string;
+};
+
+const COLORS = {
+  background: '#0B100F',
+  surface: '#131B18',
+  surfaceLight: '#1B2520',
+  border: '#29362F',
+  white: '#F4F8F5',
+  muted: '#91A097',
+  green: '#6EE7A2',
+  greenDark: '#183D2A',
+  red: '#FF7777',
+  redDark: '#402222',
+  accent: '#B8F5CE',
+};
+
+const CATEGORIES = [
+  'Food',
+  'Travel',
+  'Shopping',
+  'Bills',
+  'Salary',
+  'Health',
+  'Other',
+];
+
+// -------------------- HELPERS --------------------
+
+const formatMoney = (amount: number) =>
+  '₹' + amount.toLocaleString('en-IN', {
+    maximumFractionDigits: 2,
+  });
+
+const today = () =>
+  new Date().toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+
+// -------------------- SUMMARY CARD --------------------
+
+type SummaryCardProps = {
+  balance: number;
+  income: number;
+  expense: number;
+};
+
+function SummaryCard({
+  balance,
+  income,
+  expense,
+}: SummaryCardProps) {
+  return (
+    <View style={styles.summaryCard}>
+      <View style={styles.summaryTop}>
+        <View>
+          <Text style={styles.eyebrow}>TOTAL BALANCE</Text>
+          <Text style={styles.balance}>{formatMoney(balance)}</Text>
+          <Text style={styles.balanceCaption}>
+            Your financial overview
+          </Text>
+        </View>
+
+        <View style={styles.walletIcon}>
+          <Text style={styles.walletIconText}>₹</Text>
+        </View>
+      </View>
+
+      <View style={styles.summaryDivider} />
+
+      <View style={styles.summaryBottom}>
+        <View style={styles.summaryMetric}>
+          <View style={styles.metricHeading}>
+            <View style={[styles.metricDot, { backgroundColor: COLORS.green }]} />
+            <Text style={styles.metricLabel}>INCOME</Text>
+          </View>
+          <Text style={[styles.metricAmount, { color: COLORS.green }]}>
+            {formatMoney(income)}
+          </Text>
+        </View>
+
+        <View style={styles.metricSeparator} />
+
+        <View style={styles.summaryMetric}>
+          <View style={styles.metricHeading}>
+            <View style={[styles.metricDot, { backgroundColor: COLORS.red }]} />
+            <Text style={styles.metricLabel}>EXPENSE</Text>
+          </View>
+          <Text style={[styles.metricAmount, { color: COLORS.red }]}>
+            {formatMoney(expense)}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+// -------------------- CATEGORY CHIP --------------------
+
+type CategoryChipProps = {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+};
+
+function CategoryChip({
+  label,
+  selected,
+  onPress,
+}: CategoryChipProps) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.75}
+      style={[
+        styles.categoryChip,
+        selected && styles.categoryChipSelected,
+      ]}
+    >
+      <Text
+        style={[
+          styles.categoryChipText,
+          selected && styles.categoryChipTextSelected,
+        ]}
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+// -------------------- ADD TRANSACTION FORM --------------------
+
+type AddFormProps = {
+  onAdd: (
+    title: string,
+    amount: number,
+    type: TransactionType,
+    category: string,
+  ) => void;
+};
+
+function AddForm({ onAdd }: AddFormProps) {
+  const [title, setTitle] = useState('');
+  const [amount, setAmount] = useState('');
+  const [type, setType] = useState<TransactionType>('Expense');
+  const [category, setCategory] = useState('Food');
+
+  const submit = () => {
+    const cleanTitle = title.trim();
+    const parsedAmount = Number(amount);
+
+    if (
+      cleanTitle.length === 0 ||
+      amount.trim() === '' ||
+      !Number.isFinite(parsedAmount) ||
+      parsedAmount <= 0
+    ) {
+      Alert.alert(
+        'Invalid input',
+        'Please enter a transaction title and a valid amount greater than zero.',
+      );
+      return;
+    }
+
+    onAdd(cleanTitle, parsedAmount, type, category);
+
+    setTitle('');
+    setAmount('');
+    setType('Expense');
+    setCategory('Food');
+  };
+
+  return (
+    <View style={styles.formCard}>
+      <View style={styles.sectionHeadingRow}>
+        <View>
+          <Text style={styles.eyebrow}>TRANSACTION DETAILS</Text>
+          <Text style={styles.sectionTitle}>Add a transaction</Text>
+        </View>
+
+        <View style={styles.stepBadge}>
+          <Text style={styles.stepBadgeText}>NEW</Text>
+        </View>
+      </View>
+
+      <Text style={styles.fieldLabel}>TRANSACTION TYPE</Text>
+
+      <View style={styles.typeSelector}>
+        {(['Expense', 'Income'] as TransactionType[]).map((item) => {
+          const selected = type === item;
+          const isIncome = item === 'Income';
+
+          return (
+            <TouchableOpacity
+              key={item}
+              onPress={() => {
+                setType(item);
+                setCategory(isIncome ? 'Salary' : 'Food');
+              }}
+              style={[
+                styles.typeButton,
+                selected &&
+                  (isIncome
+                    ? styles.incomeTypeSelected
+                    : styles.expenseTypeSelected),
+              ]}
+            >
+              <Text
+                style={[
+                  styles.typeButtonText,
+                  selected && styles.typeButtonTextSelected,
+                ]}
+              >
+                {isIncome ? '+  Income' : '−  Expense'}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <Text style={styles.fieldLabel}>TRANSACTION TITLE</Text>
+
+      <TextInput
+        value={title}
+        onChangeText={setTitle}
+        placeholder="e.g. Monthly salary, Lunch"
+        placeholderTextColor={COLORS.muted}
+        style={styles.input}
+        maxLength={60}
+        returnKeyType="next"
+      />
+
+      <Text style={styles.fieldLabel}>AMOUNT (₹)</Text>
+
+      <View style={styles.amountInputContainer}>
+        <Text style={styles.rupeePrefix}>₹</Text>
+        <TextInput
+          value={amount}
+          onChangeText={(value) =>
+            setAmount(value.replace(/[^0-9.]/g, ''))
+          }
+          placeholder="0.00"
+          placeholderTextColor={COLORS.muted}
+          keyboardType="decimal-pad"
+          style={styles.amountInput}
+        />
+      </View>
+
+      <Text style={styles.fieldLabel}>SELECT CATEGORY</Text>
+
+      <View style={styles.categoryWrap}>
+        {CATEGORIES.filter((item) =>
+          type === 'Income'
+            ? ['Salary', 'Other'].includes(item)
+            : item !== 'Salary',
+        ).map((item) => (
+          <CategoryChip
+            key={item}
+            label={item}
+            selected={category === item}
+            onPress={() => setCategory(item)}
+          />
+        ))}
+      </View>
+
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={submit}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.addButtonText}>+  Add Transaction</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.formHint}>
+        Your summary updates automatically after each transaction.
+      </Text>
+    </View>
+  );
+}
+
+// -------------------- TRANSACTION ITEM --------------------
+
+type TransactionItemProps = {
+  item: Transaction;
+  onDelete: (id: string) => void;
+};
+
+function TransactionItem({
+  item,
+  onDelete,
+}: TransactionItemProps) {
+  const isIncome = item.type === 'Income';
+
+  return (
+    <View style={styles.transactionItem}>
+      <View
+        style={[
+          styles.transactionIcon,
+          {
+            backgroundColor: isIncome
+              ? COLORS.greenDark
+              : COLORS.redDark,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.transactionIconText,
+            { color: isIncome ? COLORS.green : COLORS.red },
+          ]}
+        >
+          {isIncome ? '↙' : '↗'}
+        </Text>
+      </View>
+
+      <View style={styles.transactionDetails}>
+        <Text style={styles.transactionTitle} numberOfLines={1}>
+          {item.title}
+        </Text>
+        <Text style={styles.transactionMeta}>
+          {item.category}  ·  {item.date}
+        </Text>
+      </View>
+
+      <View style={styles.transactionRight}>
+        <Text
+          style={[
+            styles.transactionAmount,
+            { color: isIncome ? COLORS.green : COLORS.red },
+          ]}
+        >
+          {isIncome ? '+' : '−'}{formatMoney(item.amount)}
+        </Text>
+        <Text style={styles.transactionType}>{item.type}</Text>
+      </View>
+
+      <TouchableOpacity
+        onPress={() =>
+          Alert.alert(
+            'Delete transaction?',
+            `Remove "${item.title}" from your records?`,
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: () => onDelete(item.id),
+              },
+            ],
+          )
+        }
+        style={styles.deleteButton}
+        accessibilityLabel={`Delete ${item.title}`}
+      >
+        <Text style={styles.deleteButtonText}>×</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// -------------------- MAIN APPLICATION --------------------
+
+export default function Index() {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [activeTab, setActiveTab] = useState<'All' | TransactionType>('All');
+
+  const income = useMemo(
+    () =>
+      transactions
+        .filter((item) => item.type === 'Income')
+        .reduce((total, item) => total + item.amount, 0),
+    [transactions],
+  );
+
+  const expense = useMemo(
+    () =>
+      transactions
+        .filter((item) => item.type === 'Expense')
+        .reduce((total, item) => total + item.amount, 0),
+    [transactions],
+  );
+
+  const balance = income - expense;
+
+  const addTransaction = (
+    title: string,
+    amount: number,
+    type: TransactionType,
+    category: string,
+  ) => {
+    const newTransaction: Transaction = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      title,
+      amount,
+      type,
+      category,
+      date: today(),
+    };
+
+    setTransactions((previous) => [newTransaction, ...previous]);
+    setActiveTab('All');
+  };
+
+  const deleteTransaction = (id: string) => {
+    setTransactions((previous) =>
+      previous.filter((item) => item.id !== id),
+    );
+  };
+
+  const visibleTransactions = useMemo(
+    () =>
+      activeTab === 'All'
+        ? transactions
+        : transactions.filter((item) => item.type === activeTab),
+    [transactions, activeTab],
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={COLORS.background}
+      />
+
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <FlatList
+          data={visibleTransactions}
+          keyExtractor={(item) => item.id}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={
+            <View>
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={styles.brandRow}>
+                  <View style={styles.brandIcon}>
+                    <Text style={styles.brandIconText}>₹</Text>
+                  </View>
+                  <View>
+                    <Text style={styles.brandTitle}>MONETRA</Text>
+                    <Text style={styles.brandSubtitle}>
+                      PERSONAL FINANCE
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>K</Text>
+                </View>
+              </View>
+
+              {/* Introduction */}
+              <View style={styles.intro}>
+                <Text style={styles.greeting}>YOUR MONEY, IN CONTROL</Text>
+                <Text style={styles.pageTitle}>Expense Manager</Text>
+                <Text style={styles.pageSubtitle}>
+                  Track your spending. Build better habits.
+                </Text>
+              </View>
+
+              {/* Financial Summary */}
+              <SummaryCard
+                balance={balance}
+                income={income}
+                expense={expense}
+              />
+
+              {/* Transaction Form */}
+              <AddForm onAdd={addTransaction} />
+
+              {/* Transaction List Heading */}
+              <View style={styles.listHeading}>
+                <View>
+                  <Text style={styles.eyebrow}>YOUR ACTIVITY</Text>
+                  <Text style={styles.sectionTitle}>Transactions</Text>
+                </View>
+
+                <View style={styles.countBadge}>
+                  <Text style={styles.countBadgeText}>
+                    {visibleTransactions.length}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Transaction Filters */}
+              <View style={styles.transactionFilters}>
+                {(['All', 'Income', 'Expense'] as const).map((tab) => (
+                  <TouchableOpacity
+                    key={tab}
+                    onPress={() => setActiveTab(tab)}
+                    style={[
+                      styles.transactionFilter,
+                      activeTab === tab && styles.transactionFilterActive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.transactionFilterText,
+                        activeTab === tab &&
+                          styles.transactionFilterTextActive,
+                      ]}
+                    >
+                      {tab}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <TransactionItem
+              item={item}
+              onDelete={deleteTransaction}
+            />
+          )}
+          ItemSeparatorComponent={() => (
+            <View style={styles.listSeparator} />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIcon}>
+                <Text style={styles.emptyIconText}>↗</Text>
+              </View>
+              <Text style={styles.emptyTitle}>
+                No transactions yet
+              </Text>
+              <Text style={styles.emptyDescription}>
+                Add your first income or expense above to see your
+                financial activity here.
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            <View style={styles.footer}>
+              <Text style={styles.footerBrand}>MONETRA</Text>
+              <Text style={styles.footerText}>
+                SMALL STEPS. SMARTER FINANCES.
+              </Text>
+            </View>
+          }
+        />
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
+
+// -------------------- STYLES --------------------
+
+const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  listContent: {
+    paddingHorizontal: 18,
+    paddingBottom: 35,
+  },
+
+  // Header
+  header: {
+    paddingTop: 15,
+    paddingBottom: 19,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 11,
+  },
+  brandIcon: {
+    width: 43,
+    height: 43,
+    borderRadius: 14,
+    backgroundColor: COLORS.green,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  brandIconText: {
+    color: '#0B1710',
+    fontSize: 24,
+    fontWeight: '900',
+  },
+  brandTitle: {
+    color: COLORS.white,
+    fontSize: 17,
+    fontWeight: '900',
+    letterSpacing: 2,
+  },
+  brandSubtitle: {
+    color: COLORS.muted,
+    fontSize: 8,
+    letterSpacing: 1.8,
+    marginTop: 4,
+  },
+  avatar: {
+    height: 42,
+    width: 42,
+    borderRadius: 21,
+    backgroundColor: COLORS.surfaceLight,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    color: COLORS.green,
+    fontSize: 16,
+    fontWeight: '900',
+  },
+
+  // Introduction
+  intro: {
+    marginTop: 25,
+    marginBottom: 19,
+  },
+  greeting: {
+    color: COLORS.green,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 2,
+    marginBottom: 9,
+  },
+  pageTitle: {
+    color: COLORS.white,
+    fontSize: 28,
+    fontWeight: '900',
+    letterSpacing: -0.8,
+  },
+  pageSubtitle: {
+    color: COLORS.muted,
+    fontSize: 12,
+    marginTop: 7,
+  },
+  eyebrow: {
+    color: COLORS.muted,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1.6,
+  },
+
+  // Summary
+  summaryCard: {
+    padding: 20,
+    borderRadius: 20,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 25,
+  },
+  summaryTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  balance: {
+    color: COLORS.white,
+    fontSize: 34,
+    fontWeight: '900',
+    marginTop: 10,
+    letterSpacing: -1,
+  },
+  balanceCaption: {
+    color: COLORS.muted,
+    fontSize: 11,
+    marginTop: 5,
+  },
+  walletIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 15,
+    backgroundColor: COLORS.greenDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  walletIconText: {
+    color: COLORS.green,
+    fontSize: 24,
+    fontWeight: '900',
+  },
+  summaryDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: 19,
+  },
+  summaryBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  summaryMetric: {
+    flex: 1,
+  },
+  metricHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+  metricDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+  },
+  metricLabel: {
+    color: COLORS.muted,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  metricAmount: {
+    fontSize: 17,
+    fontWeight: '900',
+    marginTop: 10,
+  },
+  metricSeparator: {
+    width: 1,
+    height: 42,
+    backgroundColor: COLORS.border,
+    marginHorizontal: 15,
+  },
+
+  // Form
+  formCard: {
+    padding: 18,
+    borderRadius: 19,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 28,
+  },
+  sectionHeadingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 21,
+  },
+  sectionTitle: {
+    color: COLORS.white,
+    fontSize: 21,
+    fontWeight: '900',
+    marginTop: 6,
+  },
+  stepBadge: {
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    borderRadius: 7,
+    backgroundColor: COLORS.greenDark,
+  },
+  stepBadgeText: {
+    color: COLORS.green,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  fieldLabel: {
+    color: COLORS.muted,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1.1,
+    marginBottom: 9,
+    marginTop: 15,
+  },
+  typeSelector: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  typeButton: {
+    flex: 1,
+    paddingVertical: 13,
+    borderRadius: 10,
+    alignItems: 'center',
+    backgroundColor: COLORS.surfaceLight,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  incomeTypeSelected: {
+    backgroundColor: COLORS.greenDark,
+    borderColor: '#38764E',
+  },
+  expenseTypeSelected: {
+    backgroundColor: COLORS.redDark,
+    borderColor: '#7C4141',
+  },
+  typeButtonText: {
+    color: COLORS.muted,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  typeButtonTextSelected: {
+    color: COLORS.white,
+  },
+  input: {
+    height: 49,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    color: COLORS.white,
+    fontSize: 13,
+    backgroundColor: '#0D1411',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  amountInputContainer: {
+    height: 49,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    backgroundColor: '#0D1411',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  rupeePrefix: {
+    color: COLORS.green,
+    fontSize: 19,
+    fontWeight: '900',
+    marginRight: 10,
+  },
+  amountInput: {
+    flex: 1,
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '700',
+    paddingVertical: 0,
+  },
+  categoryWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  categoryChip: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 9,
+    backgroundColor: COLORS.surfaceLight,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  categoryChipSelected: {
+    backgroundColor: COLORS.greenDark,
+    borderColor: '#38764E',
+  },
+  categoryChipText: {
+    color: '#B1BDB5',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  categoryChipTextSelected: {
+    color: COLORS.green,
+  },
+  addButton: {
+    height: 51,
+    marginTop: 24,
+    borderRadius: 11,
+    backgroundColor: COLORS.green,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButtonText: {
+    color: '#0B1710',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 0.3,
+  },
+  formHint: {
+    color: COLORS.muted,
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 12,
+    lineHeight: 16,
+  },
+
+  // Transaction list
+  listHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  countBadge: {
+    minWidth: 34,
+    height: 34,
+    paddingHorizontal: 9,
+    borderRadius: 11,
+    backgroundColor: COLORS.surfaceLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  countBadgeText: {
+    color: COLORS.green,
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  transactionFilters: {
+    flexDirection: 'row',
+    padding: 4,
+    backgroundColor: COLORS.surface,
+    borderRadius: 11,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 14,
+  },
+  transactionFilter: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  transactionFilterActive: {
+    backgroundColor: COLORS.greenDark,
+  },
+  transactionFilterText: {
+    color: COLORS.muted,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  transactionFilterTextActive: {
+    color: COLORS.green,
+    fontWeight: '900',
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 11,
+    borderRadius: 13,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  transactionIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 11,
+  },
+  transactionIconText: {
+    fontSize: 23,
+    fontWeight: '900',
+  },
+  transactionDetails: {
+    flex: 1,
+    minWidth: 0,
+  },
+  transactionTitle: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  transactionMeta: {
+    color: COLORS.muted,
+    fontSize: 9,
+    marginTop: 6,
+  },
+  transactionRight: {
+    alignItems: 'flex-end',
+    marginLeft: 5,
+  },
+  transactionAmount: {
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  transactionType: {
+    color: COLORS.muted,
+    fontSize: 9,
+    marginTop: 5,
+  },
+  deleteButton: {
+    width: 27,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 5,
+  },
+  deleteButtonText: {
+    color: COLORS.muted,
+    fontSize: 25,
+    fontWeight: '400',
+  },
+  listSeparator: {
+    height: 9,
+  },
+
+  // Empty state
+  emptyState: {
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 30,
+    borderRadius: 15,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  emptyIcon: {
+    width: 54,
+    height: 54,
+    borderRadius: 18,
+    backgroundColor: COLORS.greenDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyIconText: {
+    color: COLORS.green,
+    fontSize: 30,
+    fontWeight: '800',
+  },
+  emptyTitle: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '900',
+    marginTop: 15,
+  },
+  emptyDescription: {
+    color: COLORS.muted,
+    fontSize: 11,
+    lineHeight: 18,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+
+  // Footer
+  footer: {
+    alignItems: 'center',
+    paddingTop: 30,
+    paddingBottom: 15,
+  },
+  footerBrand: {
+    color: COLORS.white,
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 3,
+  },
+  footerText: {
+    color: COLORS.muted,
+    fontSize: 8,
+    letterSpacing: 1.4,
+    marginTop: 7,
+  },
+});
