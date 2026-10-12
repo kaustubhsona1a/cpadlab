@@ -1,0 +1,1364 @@
+
+import React, { useMemo, useState } from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
+  Image,
+  ImageBackground,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  StatusBar,
+  Modal,
+  Dimensions,
+} from 'react-native';
+
+const { width } = Dimensions.get('window');
+
+const COLORS = {
+  background: '#0B0D10',
+  surface: '#14171C',
+  surfaceLight: '#1D2229',
+  border: '#292E36',
+  white: '#F7F8FA',
+  muted: '#9198A3',
+  red: '#E53935',
+  green: '#62D6A3',
+};
+
+const HERO_IMAGE =
+  'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1500&q=90';
+
+const CARS = [
+  {
+    id: '1',
+    name: 'BMW 530d',
+    variant: 'Luxury Line • Automatic',
+    price: 4290000,
+    year: '2023',
+    km: '18,500 km',
+    fuel: 'Diesel',
+    transmission: 'Automatic',
+    category: 'Luxury',
+    location: 'Mumbai',
+    badge: 'FEATURED',
+    image:
+      'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1100&q=85',
+    description:
+      'A refined executive sedan with premium comfort, impressive performance and a sophisticated interior.',
+  },
+  {
+    id: '2',
+    name: 'Porsche 911',
+    variant: 'Carrera • PDK Automatic',
+    price: 18500000,
+    year: '2022',
+    km: '12,000 km',
+    fuel: 'Petrol',
+    transmission: 'Automatic',
+    category: 'Sports',
+    location: 'Mumbai',
+    badge: 'PREMIUM',
+    image:
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1100&q=85',
+    description:
+      'An iconic sports car combining precise handling, timeless styling and an engaging driving experience.',
+  },
+  {
+    id: '3',
+    name: 'Mercedes-Benz G-Class',
+    variant: 'G 400d • 4MATIC',
+    price: 24500000,
+    year: '2023',
+    km: '9,200 km',
+    fuel: 'Diesel',
+    transmission: 'Automatic',
+    category: 'Luxury',
+    location: 'Mumbai',
+    badge: 'RARE FIND',
+    image:
+      'https://images.unsplash.com/photo-1520031441872-265b5ff70366?auto=format&fit=crop&w=1100&q=85',
+    description:
+      'A bold luxury SUV with commanding road presence and a distinctive design.',
+  },
+  {
+    id: '4',
+    name: 'Audi A6',
+    variant: 'Technology • S tronic',
+    price: 3850000,
+    year: '2022',
+    km: '24,000 km',
+    fuel: 'Petrol',
+    transmission: 'Automatic',
+    category: 'Sedan',
+    location: 'Mumbai',
+    badge: 'GREAT VALUE',
+    image:
+      'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1100&q=85',
+    description:
+      'A premium sedan with understated styling, advanced technology and a comfortable cabin.',
+  },
+];
+
+const FILTERS = ['All Cars', 'Luxury', 'Sports', 'Sedan'];
+
+const formatPrice = (price: number) => {
+  if (price >= 10000000) {
+    return `₹${(price / 10000000).toFixed(2).replace(/\.00$/, '')} Cr`;
+  }
+  return `₹${(price / 100000).toFixed(1).replace(/\.0$/, '')} L`;
+};
+
+export default function HomeScreen() {
+  const [activeTab, setActiveTab] = useState('Home');
+  const [activeFilter, setActiveFilter] = useState('All Cars');
+  const [search, setSearch] = useState('');
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [selectedCar, setSelectedCar] = useState<(typeof CARS)[number] | null>(
+    null,
+  );
+  const [notice, setNotice] = useState('');
+
+  const filteredCars = useMemo(() => {
+    let result = CARS;
+
+    if (activeTab === 'Saved') {
+      result = result.filter((car) => savedIds.includes(car.id));
+    }
+
+    if (activeFilter !== 'All Cars') {
+      result = result.filter((car) => car.category === activeFilter);
+    }
+
+    const query = search.trim().toLowerCase();
+
+    if (query) {
+      result = result.filter(
+        (car) =>
+          car.name.toLowerCase().includes(query) ||
+          car.variant.toLowerCase().includes(query) ||
+          car.fuel.toLowerCase().includes(query),
+      );
+    }
+
+    return result;
+  }, [activeFilter, activeTab, savedIds, search]);
+
+  const toggleSaved = (id: string) => {
+    setSavedIds((previous) =>
+      previous.includes(id)
+        ? previous.filter((savedId) => savedId !== id)
+        : [...previous, id],
+    );
+  };
+
+  const handleTab = (tab: string) => {
+    setActiveTab(tab);
+    setNotice('');
+
+    if (tab === 'Inventory' || tab === 'Home') {
+      setActiveFilter('All Cars');
+    }
+
+    if (tab === 'Profile') {
+      setNotice('Welcome to Cartronics. Contact our team to get started.');
+    }
+  };
+
+  const sectionTitle =
+    activeTab === 'Saved'
+      ? 'Your Shortlist'
+      : activeTab === 'Inventory'
+        ? 'Explore Inventory'
+        : activeTab === 'Profile'
+          ? 'Your Car Journey'
+          : 'Curated For You';
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+
+      <View style={styles.app}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.brand}
+            activeOpacity={0.8}
+            onPress={() => handleTab('Home')}
+          >
+            <View style={styles.brandMark}>
+              <Text style={styles.brandMarkText}>C</Text>
+            </View>
+
+            <View>
+              <Text style={styles.brandName}>CARTRONICS</Text>
+              <Text style={styles.brandSubtitle}>PRE-OWNED. REDEFINED.</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.headerIcon}
+            onPress={() =>
+              setNotice('You are all caught up. No new notifications.')
+            }
+          >
+            <Text style={styles.headerIconText}>♧</Text>
+            <View style={styles.notificationDot} />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Hero */}
+          {activeTab === 'Home' && (
+            <>
+              <ImageBackground
+                source={{ uri: HERO_IMAGE }}
+                style={styles.hero}
+                imageStyle={styles.heroImage}
+              >
+                <View style={styles.heroOverlay} />
+
+                <View style={styles.heroContent}>
+                  <View style={styles.heroEyebrow}>
+                    <View style={styles.redDot} />
+                    <Text style={styles.heroEyebrowText}>
+                      THE ART OF DRIVING
+                    </Text>
+                  </View>
+
+                  <Text style={styles.heroTitle}>
+                    Find your{'\n'}next <Text style={styles.heroAccent}>drive.</Text>
+                  </Text>
+
+                  <Text style={styles.heroDescription}>
+                    Exceptional cars. Carefully selected.
+                    {'\n'}Confidence in every kilometre.
+                  </Text>
+
+                  <TouchableOpacity
+                    style={styles.heroButton}
+                    onPress={() => handleTab('Inventory')}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={styles.heroButtonText}>EXPLORE COLLECTION</Text>
+                    <Text style={styles.heroButtonArrow}>↗</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.heroCounter}>
+                  <Text style={styles.heroCounterNumber}>01</Text>
+                  <View style={styles.heroCounterLine} />
+                  <Text style={styles.heroCounterTotal}>04</Text>
+                </View>
+              </ImageBackground>
+
+              {/* Trust stats */}
+              <View style={styles.statsRow}>
+                <View style={styles.stat}>
+                  <Text style={styles.statNumber}>100%</Text>
+                  <Text style={styles.statLabel}>TRANSPARENCY</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.stat}>
+                  <Text style={styles.statNumber}>SELECT</Text>
+                  <Text style={styles.statLabel}>QUALITY CARS</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.stat}>
+                  <Text style={styles.statNumber}>MUMBAI</Text>
+                  <Text style={styles.statLabel}>OUR HOME</Text>
+                </View>
+              </View>
+            </>
+          )}
+
+          {/* Search */}
+          <View style={styles.searchBox}>
+            <Text style={styles.searchIcon}>⌕</Text>
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Search make, model or fuel..."
+              placeholderTextColor={COLORS.muted}
+              style={styles.searchInput}
+              returnKeyType="search"
+              autoCapitalize="none"
+            />
+            {search.length > 0 && (
+              <TouchableOpacity onPress={() => setSearch('')}>
+                <Text style={styles.clearSearch}>✕</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Inventory section */}
+          <View style={styles.sectionHeader}>
+            <View>
+              <Text style={styles.sectionEyebrow}>THE CARTRONICS EDIT</Text>
+              <Text style={styles.sectionTitle}>{sectionTitle}</Text>
+            </View>
+
+            <TouchableOpacity onPress={() => handleTab('Inventory')}>
+              <Text style={styles.viewAll}>VIEW ALL ↗</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Filters */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterRow}
+          >
+            {FILTERS.map((filter) => {
+              const selected = activeFilter === filter;
+
+              return (
+                <TouchableOpacity
+                  key={filter}
+                  onPress={() => setActiveFilter(filter)}
+                  style={[styles.filterChip, selected && styles.filterChipActive]}
+                >
+                  <Text
+                    style={[
+                      styles.filterText,
+                      selected && styles.filterTextActive,
+                    ]}
+                  >
+                    {filter}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          <Text style={styles.resultCount}>
+            {filteredCars.length} VEHICLE{filteredCars.length === 1 ? '' : 'S'} FOUND
+          </Text>
+
+          {/* Vehicle cards */}
+          {filteredCars.length > 0 ? (
+            <View style={styles.vehicleGrid}>
+              {filteredCars.map((car) => {
+                const saved = savedIds.includes(car.id);
+
+                return (
+                  <View key={car.id} style={styles.carCard}>
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={() => setSelectedCar(car)}
+                    >
+                      <ImageBackground
+                        source={{ uri: car.image }}
+                        style={styles.carImage}
+                        imageStyle={styles.carImageRadius}
+                      >
+                        <View style={styles.carImageShade} />
+
+                        <View style={styles.carBadge}>
+                          <Text style={styles.carBadgeText}>{car.badge}</Text>
+                        </View>
+                      </ImageBackground>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.heartButton}
+                      onPress={() => toggleSaved(car.id)}
+                      activeOpacity={0.8}
+                    >
+                      <Text
+                        style={[
+                          styles.heartText,
+                          saved && styles.heartTextActive,
+                        ]}
+                      >
+                        {saved ? '♥' : '♡'}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.carInfo}>
+                      <View style={styles.carTitleRow}>
+                        <Text style={styles.carName}>{car.name}</Text>
+                        <Text style={styles.carYear}>{car.year}</Text>
+                      </View>
+
+                      <Text style={styles.carVariant}>{car.variant}</Text>
+
+                      <View style={styles.carSpecs}>
+                        <Text style={styles.specText}>{car.km}</Text>
+                        <View style={styles.specDot} />
+                        <Text style={styles.specText}>{car.fuel}</Text>
+                        <View style={styles.specDot} />
+                        <Text style={styles.specText}>{car.transmission}</Text>
+                      </View>
+
+                      <View style={styles.carCardFooter}>
+                        <View>
+                          <Text style={styles.priceLabel}>OUR PRICE</Text>
+                          <Text style={styles.carPrice}>
+                            {formatPrice(car.price)}
+                          </Text>
+                        </View>
+
+                        <TouchableOpacity
+                          style={styles.arrowButton}
+                          onPress={() => setSelectedCar(car)}
+                        >
+                          <Text style={styles.arrowButtonText}>↗</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>⌕</Text>
+              <Text style={styles.emptyTitle}>No cars found</Text>
+              <Text style={styles.emptyDescription}>
+                Try another search or change your selected filter.
+              </Text>
+              <TouchableOpacity
+                style={styles.resetButton}
+                onPress={() => {
+                  setSearch('');
+                  setActiveFilter('All Cars');
+                  setActiveTab('Inventory');
+                }}
+              >
+                <Text style={styles.resetButtonText}>RESET FILTERS</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Sell your car banner */}
+          {activeTab !== 'Saved' && (
+            <View style={styles.sellBanner}>
+              <View style={styles.sellCopy}>
+                <Text style={styles.sellEyebrow}>READY FOR AN UPGRADE?</Text>
+                <Text style={styles.sellTitle}>Your car deserves{'\n'}a better deal.</Text>
+                <Text style={styles.sellDescription}>
+                  Sell with confidence. Let our team help.
+                </Text>
+
+                <TouchableOpacity
+                  style={styles.sellButton}
+                  onPress={() =>
+                    setNotice(
+                      'Thanks for your interest! Visit our Mumbai showroom or contact our team to sell your car.',
+                    )
+                  }
+                >
+                  <Text style={styles.sellButtonText}>SELL YOUR CAR ↗</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.sellDecoration}>C</Text>
+            </View>
+          )}
+
+          {/* Notice */}
+          {notice !== '' && (
+            <View style={styles.noticeBox}>
+              <Text style={styles.noticeText}>{notice}</Text>
+              <TouchableOpacity onPress={() => setNotice('')}>
+                <Text style={styles.noticeClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Text style={styles.footerBrand}>CARTRONICS</Text>
+            <Text style={styles.footerText}>BUY & SELL QUALITY CARS</Text>
+            <Text style={styles.footerCopyright}>
+              © 2026 CARTRONICS • MUMBAI
+            </Text>
+          </View>
+        </ScrollView>
+
+        {/* Bottom navigation */}
+        <View style={styles.bottomNav}>
+          {[
+            { label: 'Home', icon: '⌂' },
+            { label: 'Inventory', icon: '▦' },
+            { label: 'Saved', icon: '♡' },
+            { label: 'Profile', icon: '◉' },
+          ].map((item) => {
+            const active = activeTab === item.label;
+
+            return (
+              <TouchableOpacity
+                key={item.label}
+                style={styles.navItem}
+                onPress={() => handleTab(item.label)}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.navIcon, active && styles.navIconActive]}>
+                  {item.icon}
+                </Text>
+                <Text style={[styles.navLabel, active && styles.navLabelActive]}>
+                  {item.label}
+                </Text>
+                {active && <View style={styles.navIndicator} />}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* Vehicle detail modal */}
+      <Modal
+        visible={selectedCar !== null}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelectedCar(null)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHandle} />
+
+            {selectedCar && (
+              <>
+                <ImageBackground
+                  source={{ uri: selectedCar.image }}
+                  style={styles.modalImage}
+                  imageStyle={styles.modalImageRadius}
+                >
+                  <TouchableOpacity
+                    style={styles.modalClose}
+                    onPress={() => setSelectedCar(null)}
+                  >
+                    <Text style={styles.modalCloseText}>✕</Text>
+                  </TouchableOpacity>
+                  <View style={styles.modalImageTag}>
+                    <Text style={styles.carBadgeText}>{selectedCar.badge}</Text>
+                  </View>
+                </ImageBackground>
+
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalEyebrow}>CARTRONICS COLLECTION</Text>
+                  <Text style={styles.modalTitle}>{selectedCar.name}</Text>
+                  <Text style={styles.modalVariant}>{selectedCar.variant}</Text>
+                  <Text style={styles.modalPrice}>
+                    {formatPrice(selectedCar.price)}
+                  </Text>
+
+                  <View style={styles.modalSpecs}>
+                    <View style={styles.modalSpec}>
+                      <Text style={styles.modalSpecLabel}>YEAR</Text>
+                      <Text style={styles.modalSpecValue}>{selectedCar.year}</Text>
+                    </View>
+                    <View style={styles.modalSpec}>
+                      <Text style={styles.modalSpecLabel}>KILOMETRES</Text>
+                      <Text style={styles.modalSpecValue}>{selectedCar.km}</Text>
+                    </View>
+                    <View style={styles.modalSpec}>
+                      <Text style={styles.modalSpecLabel}>FUEL</Text>
+                      <Text style={styles.modalSpecValue}>{selectedCar.fuel}</Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.modalDescription}>
+                    {selectedCar.description}
+                  </Text>
+
+                  <View style={styles.modalActions}>
+                    <TouchableOpacity
+                      style={styles.modalPrimary}
+                      onPress={() => {
+                        setSelectedCar(null);
+                        setNotice(
+                          `Enquiry started for ${selectedCar.name}. Our team will help you with the next steps.`,
+                        );
+                      }}
+                    >
+                      <Text style={styles.modalPrimaryText}>ENQUIRE NOW ↗</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.modalSave}
+                      onPress={() => toggleSaved(selectedCar.id)}
+                    >
+                      <Text style={styles.modalSaveText}>
+                        {savedIds.includes(selectedCar.id) ? '♥ SAVED' : '♡ SAVE'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  app: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    height: 76,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  brand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 11,
+  },
+  brandMark: {
+    height: 42,
+    width: 42,
+    borderRadius: 12,
+    backgroundColor: COLORS.red,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandMarkText: {
+    color: '#FFFFFF',
+    fontSize: 28,
+    fontWeight: '900',
+    fontStyle: 'italic',
+  },
+  brandName: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 2,
+  },
+  brandSubtitle: {
+    color: COLORS.muted,
+    fontSize: 8,
+    letterSpacing: 2,
+    marginTop: 4,
+  },
+  headerIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: COLORS.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  headerIconText: {
+    fontSize: 24,
+    color: COLORS.white,
+  },
+  notificationDot: {
+    position: 'absolute',
+    right: 9,
+    top: 8,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: COLORS.red,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 28,
+  },
+  hero: {
+    height: 370,
+    marginHorizontal: 14,
+    marginTop: 16,
+    borderRadius: 20,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    backgroundColor: '#242930',
+  },
+  heroImage: {
+    borderRadius: 20,
+  },
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(5,7,10,0.65)',
+  },
+  heroContent: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+  },
+  heroEyebrow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 18,
+  },
+  redDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: COLORS.red,
+  },
+  heroEyebrowText: {
+    color: '#E5E7EA',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 2,
+  },
+  heroTitle: {
+    color: '#FFFFFF',
+    fontSize: 44,
+    lineHeight: 49,
+    fontWeight: '900',
+    letterSpacing: -1.5,
+  },
+  heroAccent: {
+    color: COLORS.red,
+  },
+  heroDescription: {
+    color: '#D2D5DA',
+    fontSize: 13,
+    lineHeight: 21,
+    marginTop: 14,
+  },
+  heroButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    marginTop: 24,
+    backgroundColor: COLORS.red,
+    paddingVertical: 15,
+    paddingHorizontal: 17,
+    borderRadius: 9,
+    gap: 20,
+  },
+  heroButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '900',
+    fontSize: 10,
+    letterSpacing: 1,
+  },
+  heroButtonArrow: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  heroCounter: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9,
+  },
+  heroCounterNumber: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  heroCounterLine: {
+    width: 35,
+    height: 2,
+    backgroundColor: COLORS.red,
+  },
+  heroCounterTotal: {
+    color: '#B0B5BE',
+    fontSize: 11,
+  },
+  statsRow: {
+    marginHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 23,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 17,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
+  },
+  stat: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statNumber: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  statLabel: {
+    color: COLORS.muted,
+    fontSize: 8,
+    marginTop: 6,
+    letterSpacing: 1,
+  },
+  statDivider: {
+    width: 1,
+    height: 27,
+    backgroundColor: COLORS.border,
+  },
+  searchBox: {
+    height: 52,
+    marginHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    gap: 10,
+  },
+  searchIcon: {
+    color: COLORS.muted,
+    fontSize: 28,
+  },
+  searchInput: {
+    flex: 1,
+    color: COLORS.white,
+    fontSize: 13,
+    paddingVertical: 0,
+  },
+  clearSearch: {
+    color: COLORS.muted,
+    fontSize: 18,
+    padding: 4,
+  },
+  sectionHeader: {
+    marginHorizontal: 20,
+    marginTop: 30,
+    marginBottom: 17,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  sectionEyebrow: {
+    color: COLORS.red,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 2,
+    marginBottom: 7,
+  },
+  sectionTitle: {
+    color: COLORS.white,
+    fontSize: 25,
+    fontWeight: '900',
+    letterSpacing: -0.6,
+  },
+  viewAll: {
+    color: COLORS.white,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    paddingBottom: 4,
+  },
+  filterRow: {
+    paddingHorizontal: 20,
+    gap: 9,
+    paddingBottom: 15,
+  },
+  filterChip: {
+    borderRadius: 9,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  filterChipActive: {
+    backgroundColor: COLORS.red,
+    borderColor: COLORS.red,
+  },
+  filterText: {
+    color: '#B0B5BE',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  filterTextActive: {
+    color: '#FFFFFF',
+  },
+  resultCount: {
+    marginHorizontal: 20,
+    marginBottom: 12,
+    color: COLORS.muted,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1.3,
+  },
+  vehicleGrid: {
+    paddingHorizontal: 16,
+    gap: 15,
+  },
+  carCard: {
+    width: '100%',
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  carImage: {
+    width: '100%',
+    height: Math.min(width * 0.53, 240),
+    justifyContent: 'flex-start',
+    backgroundColor: '#252A31',
+  },
+  carImageRadius: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  carImageShade: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.08)',
+  },
+  carBadge: {
+    alignSelf: 'flex-start',
+    margin: 13,
+    paddingVertical: 7,
+    paddingHorizontal: 9,
+    borderRadius: 5,
+    backgroundColor: COLORS.red,
+  },
+  carBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  heartButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: 'rgba(10,12,15,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heartText: {
+    color: '#FFFFFF',
+    fontSize: 23,
+  },
+  heartTextActive: {
+    color: COLORS.red,
+  },
+  carInfo: {
+    padding: 16,
+  },
+  carTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 8,
+  },
+  carName: {
+    flex: 1,
+    color: COLORS.white,
+    fontSize: 19,
+    fontWeight: '900',
+  },
+  carYear: {
+    color: COLORS.muted,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  carVariant: {
+    color: COLORS.muted,
+    fontSize: 11,
+    marginTop: 5,
+  },
+  carSpecs: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 7,
+    marginTop: 15,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  specText: {
+    color: '#C5CAD2',
+    fontSize: 10,
+  },
+  specDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: COLORS.red,
+  },
+  carCardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 14,
+  },
+  priceLabel: {
+    color: COLORS.muted,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+    marginBottom: 5,
+  },
+  carPrice: {
+    color: COLORS.white,
+    fontSize: 23,
+    fontWeight: '900',
+  },
+  arrowButton: {
+    height: 43,
+    width: 43,
+    borderRadius: 12,
+    backgroundColor: COLORS.red,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  arrowButtonText: {
+    color: '#FFFFFF',
+    fontSize: 23,
+    fontWeight: '700',
+  },
+  emptyState: {
+    marginHorizontal: 20,
+    marginTop: 10,
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 25,
+    alignItems: 'center',
+  },
+  emptyIcon: {
+    fontSize: 40,
+    color: COLORS.muted,
+  },
+  emptyTitle: {
+    color: COLORS.white,
+    fontSize: 19,
+    fontWeight: '800',
+    marginTop: 10,
+  },
+  emptyDescription: {
+    color: COLORS.muted,
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 8,
+    lineHeight: 19,
+  },
+  resetButton: {
+    marginTop: 18,
+    padding: 13,
+    borderRadius: 8,
+    backgroundColor: COLORS.red,
+  },
+  resetButtonText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  sellBanner: {
+    marginHorizontal: 16,
+    marginTop: 28,
+    minHeight: 220,
+    padding: 22,
+    borderRadius: 17,
+    overflow: 'hidden',
+    backgroundColor: '#1B2027',
+    borderWidth: 1,
+    borderColor: '#353B44',
+    justifyContent: 'center',
+  },
+  sellCopy: {
+    zIndex: 1,
+    alignItems: 'flex-start',
+  },
+  sellEyebrow: {
+    color: COLORS.red,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
+  sellTitle: {
+    color: COLORS.white,
+    fontSize: 27,
+    fontWeight: '900',
+    lineHeight: 32,
+    marginTop: 10,
+  },
+  sellDescription: {
+    color: '#B7BDC6',
+    fontSize: 11,
+    marginTop: 9,
+  },
+  sellButton: {
+    marginTop: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    backgroundColor: COLORS.red,
+  },
+  sellButtonText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+  sellDecoration: {
+    position: 'absolute',
+    right: -8,
+    bottom: -57,
+    fontSize: 230,
+    fontWeight: '900',
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.035)',
+  },
+  noticeBox: {
+    marginHorizontal: 16,
+    marginTop: 18,
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#192820',
+    borderWidth: 1,
+    borderColor: '#315442',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  noticeText: {
+    color: '#BDEBD5',
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 19,
+  },
+  noticeClose: {
+    color: '#BDEBD5',
+    fontSize: 16,
+    padding: 4,
+  },
+  footer: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    marginTop: 8,
+  },
+  footerBrand: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 3,
+  },
+  footerText: {
+    color: COLORS.muted,
+    fontSize: 8,
+    letterSpacing: 2,
+    marginTop: 8,
+  },
+  footerCopyright: {
+    color: '#5D646F',
+    fontSize: 8,
+    letterSpacing: 1,
+    marginTop: 18,
+  },
+  bottomNav: {
+    height: 70,
+    backgroundColor: '#101317',
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingBottom: 4,
+  },
+  navItem: {
+    flex: 1,
+    height: 62,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+  },
+  navIcon: {
+    color: '#737B86',
+    fontSize: 23,
+  },
+  navIconActive: {
+    color: COLORS.red,
+  },
+  navLabel: {
+    color: '#737B86',
+    fontSize: 9,
+    fontWeight: '600',
+  },
+  navLabelActive: {
+    color: COLORS.white,
+    fontWeight: '800',
+  },
+  navIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    height: 3,
+    width: 20,
+    borderRadius: 3,
+    backgroundColor: COLORS.red,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.78)',
+    justifyContent: 'flex-end',
+  },
+  modalCard: {
+    backgroundColor: COLORS.background,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    paddingTop: 10,
+    paddingBottom: 28,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    maxHeight: '93%',
+  },
+  modalHandle: {
+    alignSelf: 'center',
+    width: 42,
+    height: 4,
+    borderRadius: 3,
+    backgroundColor: '#555C66',
+    marginBottom: 12,
+  },
+  modalImage: {
+    height: 220,
+    marginHorizontal: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: COLORS.surfaceLight,
+  },
+  modalImageRadius: {
+    borderRadius: 16,
+  },
+  modalClose: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCloseText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  modalImageTag: {
+    position: 'absolute',
+    left: 12,
+    bottom: 12,
+    padding: 9,
+    backgroundColor: COLORS.red,
+    borderRadius: 5,
+  },
+  modalContent: {
+    paddingHorizontal: 21,
+    paddingTop: 21,
+  },
+  modalEyebrow: {
+    color: COLORS.red,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
+  modalTitle: {
+    color: COLORS.white,
+    fontSize: 28,
+    fontWeight: '900',
+    marginTop: 7,
+  },
+  modalVariant: {
+    color: COLORS.muted,
+    fontSize: 12,
+    marginTop: 5,
+  },
+  modalPrice: {
+    color: COLORS.white,
+    fontSize: 28,
+    fontWeight: '900',
+    marginTop: 14,
+  },
+  modalSpecs: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 17,
+    marginTop: 15,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
+  },
+  modalSpec: {
+    flex: 1,
+  },
+  modalSpecLabel: {
+    color: COLORS.muted,
+    fontSize: 8,
+    letterSpacing: 1,
+    fontWeight: '800',
+  },
+  modalSpecValue: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '800',
+    marginTop: 7,
+  },
+  modalDescription: {
+    color: '#C1C6CE',
+    fontSize: 12,
+    lineHeight: 20,
+    marginTop: 17,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 22,
+  },
+  modalPrimary: {
+    flex: 1,
+    backgroundColor: COLORS.red,
+    paddingVertical: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalPrimaryText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+  },
+  modalSave: {
+    minWidth: 105,
+    paddingHorizontal: 14,
+    paddingVertical: 16,
+    borderRadius: 10,
+    backgroundColor: COLORS.surfaceLight,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalSaveText: {
+    color: COLORS.white,
+    fontSize: 10,
+    fontWeight: '900',
+  },
+});
