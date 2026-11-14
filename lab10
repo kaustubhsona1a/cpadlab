@@ -1,0 +1,644 @@
+///mainpage.xaml
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="CartronicsXamarin.MainPage"
+    BackgroundColor="#0B0D0E"
+    Title="CARTRONICS">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Background">#0B0D0E</Color>
+            <Color x:Key="Panel">#141819</Color>
+            <Color x:Key="PanelLight">#1B2021</Color>
+            <Color x:Key="Accent">#C5F36A</Color>
+            <Color x:Key="Muted">#899393</Color>
+            <Color x:Key="Line">#293031</Color>
+            <Color x:Key="White">#F2F4EF</Color>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <!-- ScrollView contains one vertical StackLayout -->
+    <ScrollView x:Name="MainScroll">
+        <StackLayout Padding="22,18,22,28" Spacing="0">
+
+            <!-- HEADER: Horizontal StackLayout -->
+            <StackLayout Orientation="Horizontal"
+                         HorizontalOptions="FillAndExpand"
+                         VerticalOptions="Center"
+                         Spacing="12">
+
+                <Frame BackgroundColor="{StaticResource Accent}"
+                       CornerRadius="9"
+                       Padding="0"
+                       WidthRequest="40"
+                       HeightRequest="40"
+                       HasShadow="False">
+                    <Label Text="C"
+                           TextColor="#10140B"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"/>
+                </Frame>
+
+                <StackLayout VerticalOptions="Center"
+                             Spacing="2"
+                             HorizontalOptions="StartAndExpand">
+                    <Label Text="CARTRONICS"
+                           TextColor="{StaticResource White}"
+                           FontSize="17"
+                           FontAttributes="Bold"
+                           CharacterSpacing="2"/>
+                    <Label Text="AUTOMOTIVE STUDIO"
+                           TextColor="{StaticResource Muted}"
+                           FontSize="9"
+                           CharacterSpacing="2"/>
+                </StackLayout>
+
+                <!-- AbsoluteLayout: notification badge overlap -->
+                <AbsoluteLayout WidthRequest="44"
+                                HeightRequest="44">
+                    <Frame BackgroundColor="{StaticResource PanelLight}"
+                           BorderColor="{StaticResource Line}"
+                           CornerRadius="10"
+                           Padding="0"
+                           HasShadow="False"
+                           AbsoluteLayout.LayoutBounds="0,0,42,42"
+                           AbsoluteLayout.LayoutFlags="None">
+                        <Label Text="◈"
+                               FontSize="22"
+                               TextColor="{StaticResource White}"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center"/>
+                    </Frame>
+
+                    <Frame BackgroundColor="{StaticResource Accent}"
+                           CornerRadius="6"
+                           Padding="0"
+                           HasShadow="False"
+                           WidthRequest="12"
+                           HeightRequest="12"
+                           AbsoluteLayout.LayoutBounds="1,0,12,12"
+                           AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                </AbsoluteLayout>
+            </StackLayout>
+
+            <BoxView HeightRequest="1"
+                     BackgroundColor="{StaticResource Line}"
+                     Margin="0,18,0,25"/>
+
+            <!-- HERO: Grid with two columns -->
+            <Grid ColumnSpacing="18"
+                  RowSpacing="18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.05*"/>
+                    <ColumnDefinition Width="0.95*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackLayout Grid.Column="0"
+                             VerticalOptions="Center"
+                             Spacing="12">
+                    <Label Text="01 / AUTOMOTIVE EXPERIENCE"
+                           TextColor="{StaticResource Accent}"
+                           FontSize="9"
+                           FontAttributes="Bold"
+                           CharacterSpacing="2"/>
+
+                    <Label Text="Driven by&#10;Precision.&#10;Built for More."
+                           TextColor="{StaticResource White}"
+                           FontSize="31"
+                           FontAttributes="Bold"
+                           LineHeight="1.05"/>
+
+                    <Label Text="A digital automotive experience designed around performance, technology and exceptional vehicles. Welcome to the Cartronics workspace."
+                           TextColor="{StaticResource Muted}"
+                           FontSize="11"
+                           LineHeight="1.5"/>
+
+                    <Button Text="EXPLORE INVENTORY  ↗"
+                            BackgroundColor="{StaticResource Accent}"
+                            TextColor="#10140B"
+                            FontAttributes="Bold"
+                            FontSize="10"
+                            CornerRadius="7"
+                            HorizontalOptions="Start"
+                            Clicked="OnInventoryClicked"/>
+
+                    <Button Text="DEVELOPER PROFILE"
+                            BackgroundColor="Transparent"
+                            BorderColor="#41494A"
+                            BorderWidth="1"
+                            TextColor="{StaticResource White}"
+                            FontAttributes="Bold"
+                            FontSize="10"
+                            CornerRadius="7"
+                            HorizontalOptions="Start"
+                            Clicked="OnProfileClicked"/>
+                </StackLayout>
+
+                <Frame Grid.Column="1"
+                       Padding="0"
+                       CornerRadius="12"
+                       HasShadow="False"
+                       IsClippedToBounds="True"
+                       BackgroundColor="{StaticResource Panel}">
+                    <Grid>
+                        <Image Source="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1000"
+                               Aspect="AspectFill"
+                               HeightRequest="220"/>
+
+                        <StackLayout VerticalOptions="End"
+                                     Padding="12"
+                                     BackgroundColor="#CC0B0D0E"
+                                     Spacing="4">
+                            <Label Text="THE ART OF PERFORMANCE"
+                                   TextColor="{StaticResource Accent}"
+                                   FontSize="8"
+                                   CharacterSpacing="1"/>
+                            <Label Text="Beyond the Ordinary."
+                                   TextColor="{StaticResource White}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"/>
+                        </StackLayout>
+                    </Grid>
+                </Frame>
+            </Grid>
+
+            <!-- STUDIO OVERVIEW -->
+            <Grid Margin="0,35,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Text="Studio Overview"
+                       TextColor="{StaticResource White}"
+                       FontSize="18"
+                       FontAttributes="Bold"/>
+                <Label Grid.Column="1"
+                       Text="02 / AT A GLANCE"
+                       TextColor="{StaticResource Muted}"
+                       FontSize="9"
+                       VerticalTextAlignment="Center"/>
+            </Grid>
+
+            <!-- Horizontal StackLayout with nested vertical layouts -->
+            <StackLayout Orientation="Horizontal"
+                         Spacing="9">
+                <Frame BackgroundColor="{StaticResource Panel}"
+                       BorderColor="{StaticResource Line}"
+                       CornerRadius="9"
+                       Padding="12"
+                       HasShadow="False"
+                       HorizontalOptions="FillAndExpand">
+                    <StackLayout Spacing="4">
+                        <Label Text="24+"
+                               TextColor="{StaticResource Accent}"
+                               FontSize="25"
+                               FontAttributes="Bold"/>
+                        <Label Text="PROJECTS"
+                               TextColor="{StaticResource Muted}"
+                               FontSize="8"/>
+                    </StackLayout>
+                </Frame>
+
+                <Frame BackgroundColor="{StaticResource Panel}"
+                       BorderColor="{StaticResource Line}"
+                       CornerRadius="9"
+                       Padding="12"
+                       HasShadow="False"
+                       HorizontalOptions="FillAndExpand">
+                    <StackLayout Spacing="4">
+                        <Label Text="12"
+                               TextColor="{StaticResource Accent}"
+                               FontSize="25"
+                               FontAttributes="Bold"/>
+                        <Label Text="CLIENTS"
+                               TextColor="{StaticResource Muted}"
+                               FontSize="8"/>
+                    </StackLayout>
+                </Frame>
+
+                <Frame BackgroundColor="{StaticResource Panel}"
+                       BorderColor="{StaticResource Line}"
+                       CornerRadius="9"
+                       Padding="12"
+                       HasShadow="False"
+                       HorizontalOptions="FillAndExpand">
+                    <StackLayout Spacing="4">
+                        <Label Text="03"
+                               TextColor="{StaticResource Accent}"
+                               FontSize="25"
+                               FontAttributes="Bold"/>
+                        <Label Text="TECHNOLOGIES"
+                               TextColor="{StaticResource Muted}"
+                               FontSize="8"/>
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+
+            <!-- DEVELOPER PROFILE -->
+            <Grid x:Name="ProfileSection"
+                  Margin="0,34,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Text="Behind the Build"
+                       TextColor="{StaticResource White}"
+                       FontSize="18"
+                       FontAttributes="Bold"/>
+                <Label Grid.Column="1"
+                       Text="03 / DEVELOPER PROFILE"
+                       TextColor="{StaticResource Muted}"
+                       FontSize="9"
+                       VerticalTextAlignment="Center"/>
+            </Grid>
+
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="0.8*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Profile Frame containing Grid -->
+                <Frame Grid.Column="0"
+                       BackgroundColor="{StaticResource Panel}"
+                       BorderColor="{StaticResource Line}"
+                       CornerRadius="12"
+                       Padding="16"
+                       HasShadow="False">
+                    <StackLayout Spacing="15">
+                        <Grid ColumnSpacing="13">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="72"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Frame BackgroundColor="{StaticResource Accent}"
+                                   CornerRadius="12"
+                                   WidthRequest="72"
+                                   HeightRequest="72"
+                                   Padding="0"
+                                   HasShadow="False">
+                                <Label Text="KS"
+                                       TextColor="#10140B"
+                                       FontSize="25"
+                                       FontAttributes="Bold"
+                                       HorizontalTextAlignment="Center"
+                                       VerticalTextAlignment="Center"/>
+                            </Frame>
+
+                            <StackLayout Grid.Column="1"
+                                         VerticalOptions="Center"
+                                         Spacing="5">
+                                <Label Text="Kaustubh Sonawane"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"/>
+                                <Label Text="Computer Engineer · Developer"
+                                       TextColor="{StaticResource Muted}"
+                                       FontSize="10"/>
+                                <Label Text="● MUMBAI, INDIA"
+                                       TextColor="{StaticResource Accent}"
+                                       FontSize="9"/>
+                            </StackLayout>
+                        </Grid>
+
+                        <BoxView HeightRequest="1"
+                                 BackgroundColor="{StaticResource Line}"/>
+
+                        <Grid ColumnSpacing="8"
+                              RowSpacing="17">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackLayout Spacing="5">
+                                <Label Text="SPECIALISATION"
+                                       TextColor="{StaticResource Muted}"
+                                       FontSize="8"/>
+                                <Label Text="Web &amp; App Development"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="11"
+                                       FontAttributes="Bold"/>
+                            </StackLayout>
+
+                            <StackLayout Grid.Column="1"
+                                         Spacing="5">
+                                <Label Text="CURRENT PROJECT"
+                                       TextColor="{StaticResource Muted}"
+                                       FontSize="8"/>
+                                <Label Text="Cartronics"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="11"
+                                       FontAttributes="Bold"/>
+                            </StackLayout>
+
+                            <StackLayout Grid.Row="1"
+                                         Spacing="5">
+                                <Label Text="EDUCATION"
+                                       TextColor="{StaticResource Muted}"
+                                       FontSize="8"/>
+                                <Label Text="Computer Engineering"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="11"
+                                       FontAttributes="Bold"/>
+                            </StackLayout>
+
+                            <StackLayout Grid.Row="1"
+                                         Grid.Column="1"
+                                         Spacing="5">
+                                <Label Text="FOCUS"
+                                       TextColor="{StaticResource Muted}"
+                                       FontSize="8"/>
+                                <Label Text="Technology &amp; Design"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="11"
+                                       FontAttributes="Bold"/>
+                            </StackLayout>
+                        </Grid>
+                    </StackLayout>
+                </Frame>
+
+                <!-- Technical stack -->
+                <Frame Grid.Column="1"
+                       BackgroundColor="{StaticResource Panel}"
+                       BorderColor="{StaticResource Line}"
+                       CornerRadius="12"
+                       Padding="15"
+                       HasShadow="False">
+                    <StackLayout Spacing="12">
+                        <Label Text="TECHNICAL STACK"
+                               TextColor="{StaticResource Accent}"
+                               FontSize="9"
+                               FontAttributes="Bold"
+                               CharacterSpacing="2"/>
+                        <Label Text="Tools of the Trade"
+                               TextColor="{StaticResource White}"
+                               FontSize="16"
+                               FontAttributes="Bold"/>
+                        <Label Text="Technologies used to design, develop and deliver digital products."
+                               TextColor="{StaticResource Muted}"
+                               FontSize="10"
+                               LineHeight="1.4"/>
+
+                        <!-- FlexLayout with wrapping -->
+                        <FlexLayout Wrap="Wrap"
+                                    Direction="Row"
+                                    AlignItems="Start"
+                                    JustifyContent="Start">
+
+                            <Frame BackgroundColor="#202A27"
+                                   BorderColor="#38423D"
+                                   CornerRadius="6"
+                                   Padding="9,7"
+                                   Margin="0,0,6,6"
+                                   HasShadow="False">
+                                <Label Text="React"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="9"/>
+                            </Frame>
+
+                            <Frame BackgroundColor="#202A27"
+                                   BorderColor="#38423D"
+                                   CornerRadius="6"
+                                   Padding="9,7"
+                                   Margin="0,0,6,6"
+                                   HasShadow="False">
+                                <Label Text="Flutter"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="9"/>
+                            </Frame>
+
+                            <Frame BackgroundColor="#202A27"
+                                   BorderColor="#38423D"
+                                   CornerRadius="6"
+                                   Padding="9,7"
+                                   Margin="0,0,6,6"
+                                   HasShadow="False">
+                                <Label Text="JavaScript"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="9"/>
+                            </Frame>
+
+                            <Frame BackgroundColor="#202A27"
+                                   BorderColor="#38423D"
+                                   CornerRadius="6"
+                                   Padding="9,7"
+                                   Margin="0,0,6,6"
+                                   HasShadow="False">
+                                <Label Text="TypeScript"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="9"/>
+                            </Frame>
+
+                            <Frame BackgroundColor="#202A27"
+                                   BorderColor="#38423D"
+                                   CornerRadius="6"
+                                   Padding="9,7"
+                                   Margin="0,0,6,6"
+                                   HasShadow="False">
+                                <Label Text="Supabase"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="9"/>
+                            </Frame>
+
+                            <Frame BackgroundColor="#202A27"
+                                   BorderColor="#38423D"
+                                   CornerRadius="6"
+                                   Padding="9,7"
+                                   Margin="0,0,6,6"
+                                   HasShadow="False">
+                                <Label Text="Firebase"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="9"/>
+                            </Frame>
+
+                            <Frame BackgroundColor="#202A27"
+                                   BorderColor="#38423D"
+                                   CornerRadius="6"
+                                   Padding="9,7"
+                                   Margin="0,0,6,6"
+                                   HasShadow="False">
+                                <Label Text="UI / UX"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="9"/>
+                            </Frame>
+
+                            <Frame BackgroundColor="#202A27"
+                                   BorderColor="#38423D"
+                                   CornerRadius="6"
+                                   Padding="9,7"
+                                   Margin="0,0,6,6"
+                                   HasShadow="False">
+                                <Label Text="Python"
+                                       TextColor="{StaticResource White}"
+                                       FontSize="9"/>
+                            </Frame>
+
+                        </FlexLayout>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- VEHICLE SHOWCASE -->
+            <Grid x:Name="InventorySection"
+                  Margin="0,35,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Text="Featured Machines"
+                       TextColor="{StaticResource White}"
+                       FontSize="18"
+                       FontAttributes="Bold"/>
+                <Label Grid.Column="1"
+                       Text="04 / AUTOMOTIVE SHOWCASE"
+                       TextColor="{StaticResource Muted}"
+                       FontSize="9"
+                       VerticalTextAlignment="Center"/>
+            </Grid>
+
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Frame BackgroundColor="{StaticResource Panel}"
+                       BorderColor="{StaticResource Line}"
+                       CornerRadius="10"
+                       Padding="0"
+                       HasShadow="False"
+                       IsClippedToBounds="True">
+                    <StackLayout Spacing="0">
+                        <Grid>
+                            <Image Source="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900"
+                                   Aspect="AspectFill"
+                                   HeightRequest="135"/>
+                            <Frame BackgroundColor="{StaticResource Accent}"
+                                   CornerRadius="4"
+                                   Padding="7,4"
+                                   HasShadow="False"
+                                   HorizontalOptions="Start"
+                                   VerticalOptions="Start"
+                                   Margin="10">
+                                <Label Text="PERFORMANCE"
+                                       TextColor="#10140B"
+                                       FontSize="8"
+                                       FontAttributes="Bold"/>
+                            </Frame>
+                        </Grid>
+                        <StackLayout Padding="12"
+                                     Spacing="5">
+                            <Label Text="BMW M Series"
+                                   TextColor="{StaticResource White}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"/>
+                            <Label Text="Precision engineering · German performance"
+                                   TextColor="{StaticResource Muted}"
+                                   FontSize="9"/>
+                        </StackLayout>
+                    </StackLayout>
+                </Frame>
+
+                <Frame Grid.Column="1"
+                       BackgroundColor="{StaticResource Panel}"
+                       BorderColor="{StaticResource Line}"
+                       CornerRadius="10"
+                       Padding="0"
+                       HasShadow="False"
+                       IsClippedToBounds="True">
+                    <StackLayout Spacing="0">
+                        <Grid>
+                            <Image Source="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=900"
+                                   Aspect="AspectFill"
+                                   HeightRequest="135"/>
+                            <Frame BackgroundColor="{StaticResource Accent}"
+                                   CornerRadius="4"
+                                   Padding="7,4"
+                                   HasShadow="False"
+                                   HorizontalOptions="Start"
+                                   VerticalOptions="Start"
+                                   Margin="10">
+                                <Label Text="SPORT LUXURY"
+                                       TextColor="#10140B"
+                                       FontSize="8"
+                                       FontAttributes="Bold"/>
+                            </Frame>
+                        </Grid>
+                        <StackLayout Padding="12"
+                                     Spacing="5">
+                            <Label Text="Luxury Collection"
+                                   TextColor="{StaticResource White}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"/>
+                            <Label Text="Design · Comfort · Performance"
+                                   TextColor="{StaticResource Muted}"
+                                   FontSize="9"/>
+                        </StackLayout>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- FOOTER -->
+            <BoxView HeightRequest="1"
+                     BackgroundColor="{StaticResource Line}"
+                     Margin="0,30,0,15"/>
+
+            <StackLayout Orientation="Horizontal"
+                         HorizontalOptions="FillAndExpand">
+                <Label Text="© 2026 CARTRONICS STUDIO"
+                       TextColor="{StaticResource Muted}"
+                       FontSize="8"
+                       HorizontalOptions="StartAndExpand"/>
+                <Label Text="DESIGNED BY KAUSTUBH"
+                       TextColor="{StaticResource Muted}"
+                       FontSize="8"
+                       HorizontalTextAlignment="End"/>
+            </StackLayout>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
+
+//////////mainpage.xaml.cs
+  
+using System;
+using Xamarin.Forms;
+
+namespace CartronicsXamarin
+{
+    public partial class MainPage : ContentPage
+    {
+        public MainPage()
+        {
+            InitializeComponent();
+        }
+
+        private async void OnInventoryClicked(object sender, EventArgs e)
+        {
+            await MainScroll.ScrollToAsync(
+                InventorySection,
+                ScrollToPosition.Start,
+                true
+            );
+        }
+
+        private async void OnProfileClicked(object sender, EventArgs e)
+        {
+            await MainScroll.ScrollToAsync(
+                ProfileSection,
+                ScrollToPosition.Start,
+                true
+            );
+        }
+    }
+}
