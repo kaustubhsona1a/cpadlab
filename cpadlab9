@@ -1,0 +1,456 @@
+////MainPage.xaml
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="CartronicsLab9.MainPage"
+    BackgroundColor="#0B0D0E"
+    Title="Cartronics">
+
+    <ScrollView>
+        <StackLayout Padding="18" Spacing="18">
+
+            <!-- Dealership Header -->
+            <Grid ColumnDefinitions="*,Auto">
+                <StackLayout Spacing="2">
+                    <Label Text="CARTRONICS"
+                           FontSize="23"
+                           FontAttributes="Bold"
+                           TextColor="#C7F36B"/>
+                    <Label Text="PRE-OWNED AUTOMOBILES"
+                           FontSize="9"
+                           TextColor="#A5ACAF"/>
+                </StackLayout>
+
+                <Label Grid.Column="1"
+                       Text="MUMBAI"
+                       TextColor="White"
+                       VerticalOptions="Center"
+                       FontSize="12"/>
+            </Grid>
+
+            <!-- Hero Section -->
+            <Frame BackgroundColor="#191D1F"
+                   CornerRadius="16"
+                   Padding="0"
+                   HasShadow="True">
+
+                <StackLayout Spacing="0">
+                    <Image Source="https://images.unsplash.com/photo-1503376780353-7e6692767b70"
+                           HeightRequest="190"
+                           Aspect="AspectFill"/>
+
+                    <StackLayout Padding="17" Spacing="8">
+                        <Label Text="DRIVE SOMETHING EXCEPTIONAL"
+                               TextColor="#C7F36B"
+                               FontSize="10"
+                               FontAttributes="Bold"/>
+
+                        <Label Text="Find Your Next Car."
+                               TextColor="White"
+                               FontSize="27"
+                               FontAttributes="Bold"/>
+
+                        <Label Text="Quality inspected pre-owned cars. Transparent pricing. Complete confidence."
+                               TextColor="#A5ACAF"
+                               FontSize="12"/>
+
+                        <Button Text="EXPLORE INVENTORY"
+                                BackgroundColor="#C7F36B"
+                                TextColor="#101313"
+                                Clicked="OnExploreClicked"/>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Search -->
+            <Label Text="FIND YOUR CAR"
+                   TextColor="#C7F36B"
+                   FontAttributes="Bold"
+                   FontSize="13"/>
+
+            <Entry x:Name="SearchEntry"
+                   Placeholder="Search by brand or model..."
+                   PlaceholderColor="#929A9E"
+                   TextColor="White"
+                   BackgroundColor="#191D1F"/>
+
+            <Button Text="SEARCH INVENTORY"
+                    BackgroundColor="#292F32"
+                    TextColor="White"
+                    Clicked="OnSearchClicked"/>
+
+            <!-- Inventory Heading -->
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="FEATURED INVENTORY"
+                       TextColor="White"
+                       FontSize="17"
+                       FontAttributes="Bold"/>
+
+                <Label Grid.Column="1"
+                       Text="VIEW ALL"
+                       TextColor="#C7F36B"
+                       FontSize="10"
+                       VerticalOptions="Center"/>
+            </Grid>
+
+            <!-- Car 1 -->
+            <Frame BackgroundColor="#191D1F"
+                   CornerRadius="15"
+                   Padding="0">
+
+                <StackLayout Spacing="0">
+                    <Image Source="https://images.unsplash.com/photo-1555215695-3004980ad54e"
+                           HeightRequest="175"
+                           Aspect="AspectFill"/>
+
+                    <StackLayout Padding="15" Spacing="7">
+                        <Label Text="BMW 3 SERIES"
+                               TextColor="White"
+                               FontSize="18"
+                               FontAttributes="Bold"/>
+
+                        <Label Text="320d Sport | 2022 | Diesel | Automatic"
+                               TextColor="#A5ACAF"
+                               FontSize="11"/>
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="₹32.5 Lakh"
+                                   TextColor="#C7F36B"
+                                   FontSize="19"
+                                   FontAttributes="Bold"/>
+
+                            <Button Grid.Column="1"
+                                    Text="ENQUIRE"
+                                    BackgroundColor="#C7F36B"
+                                    TextColor="#101313"
+                                    FontSize="10"
+                                    Clicked="OnEnquireClicked"/>
+                        </Grid>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Car 2 -->
+            <Frame BackgroundColor="#191D1F"
+                   CornerRadius="15"
+                   Padding="0">
+
+                <StackLayout Spacing="0">
+                    <Image Source="https://images.unsplash.com/photo-1614200187524-dc4b892acf16"
+                           HeightRequest="175"
+                           Aspect="AspectFill"/>
+
+                    <StackLayout Padding="15" Spacing="7">
+                        <Label Text="MERCEDES-BENZ C-CLASS"
+                               TextColor="White"
+                               FontSize="17"
+                               FontAttributes="Bold"/>
+
+                        <Label Text="C220d | 2021 | Diesel | Automatic"
+                               TextColor="#A5ACAF"
+                               FontSize="11"/>
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="₹39.9 Lakh"
+                                   TextColor="#C7F36B"
+                                   FontSize="19"
+                                   FontAttributes="Bold"/>
+
+                            <Button Grid.Column="1"
+                                    Text="ENQUIRE"
+                                    BackgroundColor="#C7F36B"
+                                    TextColor="#101313"
+                                    FontSize="10"
+                                    Clicked="OnEnquireClicked"/>
+                        </Grid>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Car 3 -->
+            <Frame BackgroundColor="#191D1F"
+                   CornerRadius="15"
+                   Padding="0">
+
+                <StackLayout Spacing="0">
+                    <Image Source="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2"
+                           HeightRequest="175"
+                           Aspect="AspectFill"/>
+
+                    <StackLayout Padding="15" Spacing="7">
+                        <Label Text="AUDI A6"
+                               TextColor="White"
+                               FontSize="18"
+                               FontAttributes="Bold"/>
+
+                        <Label Text="Technology | 2022 | Petrol | Automatic"
+                               TextColor="#A5ACAF"
+                               FontSize="11"/>
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="₹42.0 Lakh"
+                                   TextColor="#C7F36B"
+                                   FontSize="19"
+                                   FontAttributes="Bold"/>
+
+                            <Button Grid.Column="1"
+                                    Text="ENQUIRE"
+                                    BackgroundColor="#C7F36B"
+                                    TextColor="#101313"
+                                    FontSize="10"
+                                    Clicked="OnEnquireClicked"/>
+                        </Grid>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Dealership Benefits -->
+            <Label Text="THE CARTRONICS PROMISE"
+                   TextColor="#C7F36B"
+                   FontSize="13"
+                   FontAttributes="Bold"/>
+
+            <Grid ColumnDefinitions="*,*"
+                  RowDefinitions="Auto,Auto"
+                  ColumnSpacing="10"
+                  RowSpacing="10">
+
+                <Frame BackgroundColor="#191D1F" Padding="13">
+                    <StackLayout>
+                        <Label Text="✓ INSPECTED CARS"
+                               TextColor="White"
+                               FontSize="11"
+                               FontAttributes="Bold"/>
+                        <Label Text="Quality checked vehicles"
+                               TextColor="#929A9E"
+                               FontSize="10"/>
+                    </StackLayout>
+                </Frame>
+
+                <Frame Grid.Column="1"
+                       BackgroundColor="#191D1F"
+                       Padding="13">
+                    <StackLayout>
+                        <Label Text="₹ TRANSPARENT PRICING"
+                               TextColor="White"
+                               FontSize="10"
+                               FontAttributes="Bold"/>
+                        <Label Text="No hidden charges"
+                               TextColor="#929A9E"
+                               FontSize="10"/>
+                    </StackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1"
+                       BackgroundColor="#191D1F"
+                       Padding="13">
+                    <StackLayout>
+                        <Label Text="↗ EASY FINANCE"
+                               TextColor="White"
+                               FontSize="11"
+                               FontAttributes="Bold"/>
+                        <Label Text="Finance assistance"
+                               TextColor="#929A9E"
+                               FontSize="10"/>
+                    </StackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1"
+                       Grid.Column="1"
+                       BackgroundColor="#191D1F"
+                       Padding="13">
+                    <StackLayout>
+                        <Label Text="★ TRUSTED SERVICE"
+                               TextColor="White"
+                               FontSize="11"
+                               FontAttributes="Bold"/>
+                        <Label Text="Customer-first approach"
+                               TextColor="#929A9E"
+                               FontSize="10"/>
+                    </StackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- Test Drive -->
+            <Frame BackgroundColor="#191D1F"
+                   CornerRadius="15"
+                   Padding="16">
+
+                <StackLayout Spacing="10">
+                    <Label Text="BOOK A TEST DRIVE"
+                           TextColor="#C7F36B"
+                           FontAttributes="Bold"
+                           FontSize="14"/>
+
+                    <Entry x:Name="CustomerName"
+                           Placeholder="Your name"
+                           PlaceholderColor="#929A9E"
+                           TextColor="White"/>
+
+                    <Entry x:Name="CustomerPhone"
+                           Placeholder="Mobile number"
+                           Keyboard="Telephone"
+                           PlaceholderColor="#929A9E"
+                           TextColor="White"/>
+
+                    <Button Text="REQUEST A CALLBACK"
+                            BackgroundColor="#C7F36B"
+                            TextColor="#101313"
+                            Clicked="OnCallbackClicked"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Dealership Availability -->
+            <Frame BackgroundColor="#191D1F"
+                   CornerRadius="13"
+                   Padding="14">
+
+                <StackLayout Orientation="Horizontal">
+                    <Label x:Name="StoreStatus"
+                           Text="Showroom currently closed"
+                           TextColor="White"
+                           HorizontalOptions="StartAndExpand"
+                           VerticalOptions="Center"/>
+
+                    <Switch Toggled="OnStoreStatusChanged"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Brands -->
+            <Label Text="POPULAR BRANDS"
+                   TextColor="#C7F36B"
+                   FontSize="13"
+                   FontAttributes="Bold"/>
+
+            <CollectionView x:Name="BrandCollection"
+                            HeightRequest="55">
+
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal"
+                                       ItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BackgroundColor="#292F32"
+                               CornerRadius="10"
+                               Padding="16,10">
+                            <Label Text="{Binding}"
+                                   TextColor="White"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"/>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="CARTRONICS AUTOMOTIVE  •  MUMBAI"
+                   TextColor="#929A9E"
+                   FontSize="10"
+                   HorizontalTextAlignment="Center"/>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
+
+
+
+
+  /////MainPage.xaml.cs
+
+
+using System;
+using Xamarin.Forms;
+
+namespace CartronicsLab9
+{
+    public partial class MainPage : ContentPage
+    {
+        public MainPage()
+        {
+            InitializeComponent();
+
+            BrandCollection.ItemsSource = new string[]
+            {
+                "BMW",
+                "Mercedes-Benz",
+                "Audi",
+                "Porsche",
+                "Jaguar",
+                "Land Rover",
+                "Volvo"
+            };
+        }
+
+        private async void OnExploreClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert(
+                "Our Inventory",
+                "Explore our premium pre-owned car collection.",
+                "OK"
+            );
+        }
+
+        private async void OnSearchClicked(object sender, EventArgs e)
+        {
+            string search = SearchEntry.Text;
+
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                await DisplayAlert(
+                    "Search",
+                    "Please enter a car brand or model.",
+                    "OK"
+                );
+                return;
+            }
+
+            await DisplayAlert(
+                "Search Results",
+                "Searching inventory for: " + search,
+                "OK"
+            );
+        }
+
+        private async void OnEnquireClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert(
+                "Enquiry",
+                "Thank you for your interest. Our dealership team will assist you.",
+                "OK"
+            );
+        }
+
+        private async void OnCallbackClicked(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(CustomerName.Text) ||
+                string.IsNullOrWhiteSpace(CustomerPhone.Text))
+            {
+                await DisplayAlert(
+                    "Missing Details",
+                    "Please enter your name and mobile number.",
+                    "OK"
+                );
+                return;
+            }
+
+            await DisplayAlert(
+                "Request Received",
+                "Thank you " + CustomerName.Text +
+                ". Our team will contact you.",
+                "OK"
+            );
+
+            CustomerName.Text = "";
+            CustomerPhone.Text = "";
+        }
+
+        private void OnStoreStatusChanged(object sender, ToggledEventArgs e)
+        {
+            StoreStatus.Text = e.Value
+                ? "Showroom currently open"
+                : "Showroom currently closed";
+        }
+    }
+}
